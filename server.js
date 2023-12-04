@@ -8,7 +8,6 @@ const port = process.env.PORT || 3000;
 
 const app = express();
 
-app.use(express.json({ limit: '10mb' }));
 app.use(session({
   secret: process.env.SECRET,
   resave: false,
@@ -17,6 +16,8 @@ app.use(session({
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(express.json({ limit: '10mb' }));
 
 app.use((req, res, next) => {
   console.log("Incoming Request Body:", req.body);
