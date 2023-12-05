@@ -1,3 +1,4 @@
+//authentication.js
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
 const pool = require('./db');
@@ -54,12 +55,10 @@ module.exports = (app, passport) => {
     }
     // If authentication succeeded, log in the user and initialize the session
       req.login(user, (loginErr) => {
-         console.log(req.user.id)
       if (loginErr) {
         return next(loginErr);
       }
         // Redirect to a success page or send a success response
-        console.log(req.user.id)
       return res.status(200).send('Authentication successful');
     });
   })(req, res, next);

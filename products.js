@@ -1,3 +1,5 @@
+//products.js
+
 module.exports = (app, pool) => {
   app.post('/products', async (req, res) => {
     // Add a new product
