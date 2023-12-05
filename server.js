@@ -29,6 +29,7 @@ require('./authentication')(app, passport, pool);
 require('./user')(app, pool);
 require('./products')(app, pool);
 require('./cart')(app, pool);
+require('./checkout')(app, pool);
 
 app.get('/', (req, res) => {
   res.send('Hello, this is the E-commerce API!');
