@@ -4,7 +4,8 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const session = require('express-session');
 const flash = require('connect-flash');
-const pool = require('./db');
+const pool = require('./db'); 
+const middleware = require('./middleware');
 const port = process.env.PORT || 3000;
 
 const app = express();
@@ -30,6 +31,7 @@ require('./user')(app, pool);
 require('./products')(app, pool);
 require('./cart')(app, pool);
 require('./checkout')(app, pool);
+require('./orders')(app, pool, middleware);
 
 app.get('/', (req, res) => {
   res.send('Hello, this is the E-commerce API!');
