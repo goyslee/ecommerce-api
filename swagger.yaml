@@ -1,0 +1,500 @@
+---
+swagger: '2.0'
+info:
+  version: '1.0.0'
+  title: Shopping Cart API
+  description: API for managing shopping carts and checkout
+basePath: /api
+paths:
+  /:
+    get:
+      description: Get a simple message indicating the API is running.
+      responses:
+        '200':
+          content:
+            text/plain:
+              schema:
+                type: string
+          description: Successful response
+      summary: Get the root endpoint
+  /cart:
+    delete:
+      description: Remove a product from the user's cart.
+      parameters:
+        - description: ID of the cart item to delete
+          in: path
+          name: itemId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Cart item deleted successfully
+        '404':
+          description: Cart item not found
+        '500':
+          description: Server error
+      summary: Delete an item from the cart
+    post:
+      description: Add a product to the user's cart with the specified quantity.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                productid:
+                  description: ID of the product to add to the cart
+                  type: integer
+                quantity:
+                  description: Quantity of the product to add to the cart
+                  type: integer
+              type: object
+        description: Cart item data
+        required: true
+      responses:
+        '201':
+          description: Cart item added successfully
+        '400':
+          description: Invalid quantity or insufficient stock
+        '404':
+          description: Product not found
+        '500':
+          description: Server error
+      summary: Add an item to the cart
+    put:
+      description: Update the quantity of a product in the user's cart.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                productid:
+                  description: ID of the product to update in the cart
+                  type: integer
+                quantity:
+                  description: Updated quantity of the product in the cart
+                  type: integer
+              type: object
+        description: Updated cart item data
+        required: true
+      responses:
+        '200':
+          description: Cart item updated successfully
+        '400':
+          description: Invalid quantity or insufficient stock
+        '404':
+          description: Product not found in the cart
+        '500':
+          description: Server error
+      summary: Update an item in the cart
+  /cart/{cartId}/checkout/:
+    post:
+      description: |
+        Checkout a user's cart, process payment, and create an order.
+        This endpoint simulates payment processing for demonstration purposes.
+      parameters:
+        - description: ID of the cart to checkout
+          in: path
+          name: cartId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Checkout successful
+        '400':
+          description: Invalid cart or payment failed
+        '403':
+          description: Not authorized to view other users' carts
+        '500':
+          description: Server error
+      security:
+        - BearerAuth: []
+      summary: Checkout a user's cart       
+  /orders:
+    get:
+      description: Get all orders for the authenticated user.
+      responses:
+        '200':
+          description: List of orders retrieved successfully
+      security:
+        - BearerAuth: []
+      summary: Get all orders
+    post:
+      description: Create a new order with the provided information.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewOrder'
+        description: Order data
+      responses:
+        '201':
+          description: Order created successfully
+        '500':
+          description: Server error
+      security:
+        - BearerAuth: []
+      summary: Create a new order 
+  /orders/{orderId}:
+    delete:
+      description: Delete an order by order ID for the authenticated user.
+      parameters:
+        - description: ID of the order to delete
+          in: path
+          name: orderId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Order deleted successfully
+        '404':
+          description: Order not found
+        '500':
+          description: Server error
+      security:
+        - BearerAuth: []
+      summary: Delete an order
+    get:
+      description: Retrieve an order by order ID for the authenticated user.
+      parameters:
+        - description: ID of the order to retrieve
+          in: path
+          name: orderId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Order retrieved successfully
+        '404':
+          description: Order not found
+        '500':
+          description: Server error
+      security:
+        - BearerAuth: []
+      summary: Get an order by ID
+    put:
+      description: Update an order by order ID for the authenticated user.
+      parameters:
+        - description: ID of the order to update
+          in: path
+          name: orderId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrder'
+        description: Updated order data
+      responses:
+        '200':
+          description: Order updated successfully
+        '404':
+          description: Order not found
+        '500':
+          description: Server error
+      security:
+        - BearerAuth: []
+      summary: Update an order
+  /orders/{orderId}/orderdetails/{orderDetailId}:
+    delete:
+      description: Delete order details by order ID and order detail ID for the authenticated user.
+      parameters:
+        - description: ID of the order to delete
+          in: path
+          name: orderId
+          required: true
+          schema:
+            type: integer
+        - description: ID of the order detail to delete
+          in: path
+          name: orderDetailId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                quantityToRemove:
+                  type: integer
+              type: object
+        description: Quantity to remove from order detail
+        required: true
+      responses:
+        '204':
+          description: Order detail deleted successfully
+        '400':
+          description: Invalid quantity to remove or quantity cannot be negative
+        '404':
+          description: Order detail not found
+        '500':
+          description: Server error
+      security:
+        - BearerAuth: []
+      summary: Delete order details
+    put:
+      description: Update order details by order ID and order detail ID for the authenticated user.
+      parameters:
+        - description: ID of the order to update
+          in: path
+          name: orderId
+          required: true
+          schema:
+            type: integer
+        - description: ID of the order detail to update
+          in: path
+          name: orderDetailId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrderDetail'
+        description: Updated order detail data
+      responses:
+        '204':
+          description: Order detail updated successfully
+        '400':
+          description: Invalid quantity or quantity cannot be negative
+        '404':
+          description: Order detail not found
+        '500':
+          description: Server error
+      security:
+        - BearerAuth: []
+      summary: Update order details
+  /products:
+    get:
+      description: Get a list of all products or filter by category.
+      parameters:
+        - description: Filter products by category (optional)
+          in: query
+          name: category
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of products retrieved successfully
+      summary: Get products
+    post:
+      description: Add a new product to the inventory.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+        description: Product data
+      responses:
+        '201':
+          description: Product added successfully
+      summary: Add a new product
+  /products/{productid}:
+    delete:
+      description: Delete a product by product ID with authorization check.
+      parameters:
+        - description: ID of the product to delete
+          in: path
+          name: productid
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Product deleted successfully
+        '400':
+          description: Cannot delete product associated with orders
+        '403':
+          description: Not authorized to delete products
+      summary: Delete a product
+    get:
+      description: Retrieve product information by product ID.
+      parameters:
+        - description: ID of the product to retrieve
+          in: path
+          name: productid
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Product information retrieved successfully
+        '404':
+          description: Product not found
+      summary: Get a product by ID
+    put:
+      description: Update product information by product ID.
+      parameters:
+        - description: ID of the product to update
+          in: path
+          name: productid
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+        description: Updated product data
+      responses:
+        '200':
+          description: Product information updated successfully
+        '404':
+          description: Product not found
+      summary: Update a product
+  /users/register:
+    post:
+      description: Register a new user with the provided information.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+        description: User registration data
+      responses:
+        '201':
+          description: User registered successfully and cart created
+      summary: Register a new user
+  /users/{userid}:
+    delete:
+      description: Delete a user by user ID with authorization check.
+      parameters:
+        - description: ID of the user to delete
+          in: path
+          name: userid
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: User deleted successfully
+        '403':
+          description: Not authorized to delete other users' accounts
+      summary: Delete a user
+    get:
+      description: Retrieve user information by user ID.
+      parameters:
+        - description: ID of the user to retrieve
+          in: path
+          name: userid
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User information retrieved successfully
+        '404':
+          description: User not found
+      summary: Get a user by ID
+    put:
+      description: Update user information by user ID with authorization check.
+      parameters:
+        - description: ID of the user to update
+          in: path
+          name: userid
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+        description: Updated user data
+      responses:
+        '200':
+          description: User information updated successfully
+        '403':
+          description: Not authorized to change other users' accounts
+        '404':
+          description: User not found
+      summary: Update user information
+  schemas:
+    NewOrder:
+      properties:
+        orderdetails:
+          items:
+            $ref: '#/components/schemas/OrderDetail'
+          type: array
+        shippingaddress:
+          type: string
+        totalprice:
+          type: number
+      type: object
+    OrderDetail:
+      properties:
+        productid:
+          type: integer
+        quantity:
+          type: integer
+      type: object
+    Product:
+      properties:
+        category:
+          type: string
+        description:
+          type: string
+        name:
+          type: string
+        price:
+          type: number
+        stockquantity:
+          type: integer
+      type: object
+    UpdateOrder:
+      properties:
+        shippingaddress:
+          type: string
+        totalprice:
+          type: number
+      type: object
+    UpdateOrderDetail:
+      properties:
+        quantity:
+          type: integer
+        quantityToRemove:
+          type: integer
+      type: object
+    UserRegistration:
+      properties:
+        address:
+          type: string
+        email:
+          format: email
+          type: string
+        name:
+          type: string
+        password:
+          type: string
+        phonenumber:
+          pattern: ^[0-9+\\-\\s]+$
+          type: string
+      type: object
+    UserUpdate:
+      properties:
+        address:
+          type: string
+        email:
+          format: email
+          type: string
+        name:
+          type: string
+        password:
+          type: string
+        phonenumber:
+          pattern: ^[0-9+\\-\\s]+$
+          type: string
+      type: object
+securitySchemes:
+  BearerAuth:
+    bearerFormat: JWT
+    scheme: bearer
+    type: http

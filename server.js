@@ -6,9 +6,14 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const pool = require('./db'); 
 const middleware = require('./middleware');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('js-yaml'); 
+const fs = require('fs');
+
 const port = process.env.PORT || 3000;
 
 const app = express();
+const swaggerDocument = YAML.load(fs.readFileSync('./swagger.yaml', 'utf8'));
 
 app.use(session({
   secret: process.env.SECRET,
@@ -25,6 +30,8 @@ app.use((req, res, next) => {
   console.log("Incoming Request Body:", req.body);
   next();
 });
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 require('./authentication')(app, passport, pool);
 require('./user')(app, pool);

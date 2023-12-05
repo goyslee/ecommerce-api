@@ -1,0 +1,646 @@
+
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "E-commerce API",
+    "version": "1.0.0",
+    "description": "Documentation for the E-commerce API"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Get the root endpoint",
+        "description": "Get a simple message indicating the API is running.",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/register": {
+      "post": {
+        "summary": "Register a new user",
+        "description": "Register a new user with the provided information.",
+        "requestBody": {
+          "description": "User registration data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegistration"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully and cart created"
+          }
+        }
+      }
+    },
+    "/users/{userid}": {
+      "get": {
+        "summary": "Get a user by ID",
+        "description": "Retrieve user information by user ID.",
+        "parameters": [
+          {
+            "name": "userid",
+            "in": "path",
+            "description": "ID of the user to retrieve",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User information retrieved successfully"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update user information",
+        "description": "Update user information by user ID with authorization check.",
+        "parameters": [
+          {
+            "name": "userid",
+            "in": "path",
+            "description": "ID of the user to update",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Updated user data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User information updated successfully"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "403": {
+            "description": "Not authorized to change other users' accounts"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a user",
+        "description": "Delete a user by user ID with authorization check.",
+        "parameters": [
+          {
+            "name": "userid",
+            "in": "path",
+            "description": "ID of the user to delete",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User deleted successfully"
+          },
+          "403": {
+            "description": "Not authorized to delete other users' accounts"
+          }
+        }
+      }
+    },
+    "/products": {
+      "post": {
+        "summary": "Add a new product",
+        "description": "Add a new product to the inventory.",
+        "requestBody": {
+          "description": "Product data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Product"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Product added successfully"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get products",
+        "description": "Get a list of all products or filter by category.",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Filter products by category (optional)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of products retrieved successfully"
+          }
+        }
+      }
+    },
+    "/products/{productid}": {
+      "get": {
+        "summary": "Get a product by ID",
+        "description": "Retrieve product information by product ID.",
+        "parameters": [
+          {
+            "name": "productid",
+            "in": "path",
+            "description": "ID of the product to retrieve",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product information retrieved successfully"
+          },
+          "404": {
+            "description": "Product not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a product",
+        "description": "Update product information by product ID.",
+        "parameters": [
+          {
+            "name": "productid",
+            "in": "path",
+            "description": "ID of the product to update",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Updated product data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Product"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product information updated successfully"
+          },
+          "404": {
+            "description": "Product not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a product",
+        "description": "Delete a product by product ID with authorization check.",
+        "parameters": [
+          {
+            "name": "productid",
+            "in": "path",
+            "description": "ID of the product to delete",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Product deleted successfully"
+          },
+          "403": {
+            "description": "Not authorized to delete products"
+          },
+          "400": {
+            "description": "Cannot delete product associated with orders"
+          }
+        }
+      }
+    },
+    "/orders": {
+      "get": {
+        "summary": "Get all orders",
+        "description": "Get all orders for the authenticated user.",
+        "responses": {
+          "200": {
+            "description": "List of orders retrieved successfully"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create a new order",
+        "description": "Create a new order with the provided information.",
+        "requestBody": {
+          "description": "Order data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewOrder"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Order created successfully"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/orders/{orderId}": {
+      "get": {
+        "summary": "Get an order by ID",
+        "description": "Retrieve an order by order ID for the authenticated user.",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "description": "ID of the order to retrieve",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order retrieved successfully"
+          },
+          "404": {
+            "description": "Order not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "Update an order",
+        "description": "Update an order by order ID for the authenticated user.",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "description": "ID of the order to update",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Updated order data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrder"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order updated successfully"
+          },
+          "404": {
+            "description": "Order not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete an order",
+        "description": "Delete an order by order ID for the authenticated user.",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "description": "ID of the order to delete",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Order deleted successfully"
+          },
+          "404": {
+            "description": "Order not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/orders/{orderId}/orderdetails/{orderDetailId}": {
+      "put": {
+        "summary": "Update order details",
+        "description": "Update order details by order ID and order detail ID for the authenticated user.",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "description": "ID of the order to update",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "orderDetailId",
+            "in": "path",
+            "description": "ID of the order detail to update",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Updated order detail data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrderDetail"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Order detail updated successfully"
+          },
+          "404": {
+            "description": "Order detail not found"
+          },
+          "400": {
+            "description": "Invalid quantity or quantity cannot be negative"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete order details",
+        "description": "Delete order details by order ID and order detail ID for the authenticated user.",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "description": "ID of the order to delete",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "orderDetailId",
+            "in": "path",
+            "description": "ID of the order detail to delete",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Quantity to remove from order detail",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "quantityToRemove": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "quantityToRemove"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Order detail deleted successfully"
+          },
+          "404": {
+            "description": "Order detail not found"
+          },
+          "400": {
+            "description": "Invalid quantity to remove or quantity cannot be negative"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "/cart/{cartId}/checkout": {
+    "post": {
+      "summary": "Process cart checkout",
+      "description": "Process checkout for a user's cart",
+      "parameters": [
+        {
+          "name": "cartId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          },
+          "description": "ID of the cart to checkout"
+        }
+      ],
+      "requestBody": {
+        "description": "Checkout request",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "type": "integer",
+                  "description": "User ID for payment"
+                },
+                "totalPrice": {
+                  "type": "number",
+                  "description": "Total price of the cart"
+                }
+              },
+              "required": [
+                "userId",
+                "totalPrice"
+              ]
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Checkout successful"
+        },
+        "400": {
+          "description": "Bad request, payment failed, or invalid cart"
+        },
+        "403": {
+          "description": "Not authorized to view other users' carts"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserRegistration": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "phonenumber": {
+            "type": "string",
+            "pattern": "^[0-9+\\-\\s]+$"
+          }
+        }
+      },
+      "UserUpdate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "phonenumber": {
+            "type": "string",
+            "pattern": "^[0-9+\\-\\s]+$"
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "stockquantity": {
+            "type": "integer"
+          },
+          "category": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
