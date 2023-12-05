@@ -72,14 +72,6 @@ module.exports = (app, pool, middleware) => {
     }
   });
     
-   // orders.js
-
-// ... (Other routes)
-
-// orders.js
-
-// ... (Other routes)
-
 app.put('/orders/:orderId/orderdetails/:orderDetailId', async (req, res) => {
   const userId = req.user.userid;
   const orderId = req.params.orderId;
@@ -140,11 +132,6 @@ app.put('/orders/:orderId/orderdetails/:orderDetailId', async (req, res) => {
     res.status(500).send(err.message);
   }
 });
-
-// ... (Other routes)
-
-
-
 
   app.delete('/orders/:orderId', async (req, res) => {
     // Delete an order by orderId
