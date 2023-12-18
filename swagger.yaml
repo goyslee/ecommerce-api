@@ -17,7 +17,7 @@ paths:
                 type: string
           description: Successful response
       summary: Get the root endpoint
-  /cart:
+  /cart/add:
     delete:
       description: Remove a product from the user's cart.
       parameters:
